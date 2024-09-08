@@ -35,14 +35,24 @@ class FoodQualityViewModel : ViewModel() {
         }
     }
 
-    private fun uriToBitmap(context: Context, uri: Uri): Bitmap {
-        return if (Build.VERSION.SDK_INT < 28) {
-            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-        } else {
-            val source = ImageDecoder.createSource(context.contentResolver, uri)
-            ImageDecoder.decodeBitmap(source)
+    private suspend fun uriToBitmap(context: Context, uri: Uri): Bitmap = withContext(Dispatchers.IO) {
+        when {
+            uri.scheme == "https" -> {
+                val url = URL(uri.toString())
+                val connection = url.openConnection() as HttpURLConnection
+                connection.doInput = true
+                connection.connect()
+                val inputStream = connection.inputStream
+                BitmapFactory.decodeStream(inputStream)
+            }
+            Build.VERSION.SDK_INT < 28 -> MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+            else -> {
+                val source = ImageDecoder.createSource(context.contentResolver, uri)
+                ImageDecoder.decodeBitmap(source)
+            }
         }
     }
+    
 
     private fun getFileProviderAuthority(context: Context): String {
         return "${context.packageName}.fileprovider"

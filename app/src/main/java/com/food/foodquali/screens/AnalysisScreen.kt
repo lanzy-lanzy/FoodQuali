@@ -318,3 +318,4 @@ suspend fun Context.getCameraProvider(): ProcessCameraProvider = suspendCoroutin
         }, ContextCompat.getMainExecutor(this))
     }
 }
+
