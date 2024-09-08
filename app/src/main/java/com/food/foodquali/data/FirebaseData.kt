@@ -2,9 +2,13 @@ package com.food.foodquali.data
 
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import com.google.firebase.storage.FirebaseStorage
+import java.io.File
+import android.net.Uri
 
 object FirebaseData {
     private val db = FirebaseFirestore.getInstance()
+    private val storage = FirebaseStorage.getInstance()
     private const val COLLECTION_NAME = "food_analysis"
 
     suspend fun getAnalysisHistory(): List<Map<String, Any>> {
@@ -18,9 +22,15 @@ object FirebaseData {
         }
     }
 
-    suspend fun saveAnalysisResult(imageUri: String, result: String): String {
+    suspend fun uploadImage(imageUri: Uri): String {
+        val filename = "image_${System.currentTimeMillis()}.jpg"
+        val ref = storage.reference.child("food_images/$filename")
+        return ref.putFile(imageUri).await().storage.downloadUrl.await().toString()
+    }
+
+    suspend fun saveAnalysisResult(imageUrl: String, result: String): String {
         val analysis = hashMapOf(
-            "imageUri" to imageUri,
+            "imageUrl" to imageUrl,
             "result" to result,
             "timestamp" to System.currentTimeMillis()
         )

@@ -127,7 +127,7 @@ package com.food.foodquali.screens
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AsyncImage(
-                    model = analysis["imageUri"] as String,
+                    model = analysis["imageUrl"] as String,
                     contentDescription = "Food Image",
                     modifier = Modifier
                         .size(80.dp)
@@ -164,7 +164,7 @@ fun AnalysisDetailsDialog(analysis: Map<String, Any>, onDismiss: () -> Unit) {
         text = {
             Column {
                 AsyncImage(
-                    model = analysis["imageUri"] as String,
+                    model = analysis["imageUrl"] as String,
                     contentDescription = "Food Image",
                     modifier = Modifier
                         .fillMaxWidth()
@@ -187,7 +187,6 @@ fun AnalysisDetailsDialog(analysis: Map<String, Any>, onDismiss: () -> Unit) {
         }
     )
 }
-
 fun formatTimestamp(timestamp: Long): String {
     val sdf = SimpleDateFormat("dd MMM yyyy, HH:mm:ss", Locale.getDefault())
     return sdf.format(Date(timestamp))
