@@ -44,235 +44,204 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-    @RequiresApi(Build.VERSION_CODES.P)
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun AnalysisScreen(navController: NavController) {
-        val viewModel: FoodQualityViewModel = viewModel()
-        var imageUri by remember { mutableStateOf<Uri?>(null) }
-        val context = LocalContext.current
-        val lifecycleOwner = LocalLifecycleOwner.current
-        val analysisResult by viewModel.analysisResult.collectAsState()
-        var showCameraPreview by remember { mutableStateOf(false) }
-        var isAnalyzing by remember { mutableStateOf(false) }
 
-        val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+@RequiresApi(Build.VERSION_CODES.P)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AnalysisScreen(navController: NavController) {
+    val viewModel: FoodQualityViewModel = viewModel()
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val analysisResult by viewModel.analysisResult.collectAsState()
+    var showCameraPreview by remember { mutableStateOf(false) }
+    var isAnalyzing by remember { mutableStateOf(false) }
 
-        DisposableEffect(navController) {
-            val listener = NavController.OnDestinationChangedListener { _, _, _ ->
-                imageUri = null
-                viewModel.clearAnalysisResult()
-            }
-            navController.addOnDestinationChangedListener(listener)
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-            onDispose {
-                navController.removeOnDestinationChangedListener(listener)
-            }
+    DisposableEffect(navController) {
+        val listener = NavController.OnDestinationChangedListener { _, _, _ ->
+            imageUri = null
+            viewModel.clearAnalysisResult()
         }
+        navController.addOnDestinationChangedListener(listener)
 
-        val cameraPermissionLauncher = rememberLauncherForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                showCameraPreview = true
-            } else {
-                Log.e("AnalysisScreen", "Camera permission denied.")
-            }
-        }
-
-        val galleryLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.GetContent()
-        ) { uri: Uri? ->
-            uri?.let {
-                imageUri = it
-                isAnalyzing = true
-                viewModel.uploadImageToFirebase(it,
-                    onSuccess = { downloadUrl ->
-                        viewModel.analyzeFoodImage(context, Uri.parse(downloadUrl))
-                    },
-                    onFailure = { exception ->
-                        Log.e("AnalysisScreen", "Failed to upload image", exception)
-                    }
-                )
-            }
-        }
-
-        Scaffold(
-            topBar = {
-                LargeTopAppBar(
-                    title = { Text("Food Analysis") },
-                    navigationIcon = {
-                        IconButton(onClick = { navController.navigateUp() }) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { navController.navigate("history") }) {
-                            Icon(Icons.Default.History, contentDescription = "History")
-                        }
-                    },
-                    scrollBehavior = scrollBehavior
-                )
-            }
-        ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                AnimatedVisibility(
-                    visible = !showCameraPreview,
-                    enter = fadeIn() + expandVertically(),
-                    exit = fadeOut() + shrinkVertically()
-                ) {
-                    AnalysisContent(
-                        imageUri = imageUri,
-                        isAnalyzing = isAnalyzing,
-                        analysisResult = analysisResult,
-                        onCaptureClick = {
-                            val permission = Manifest.permission.CAMERA
-                            when {
-                                ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED -> {
-                                    showCameraPreview = true
-                                }
-                                else -> cameraPermissionLauncher.launch(permission)
-                            }
-                        },
-                        onUploadClick = { galleryLauncher.launch("image/*") }
-                    )
-                }
-
-                if (showCameraPreview) {
-                    CameraPreview(
-                        onImageCaptured = { uri ->
-                            imageUri = uri
-                            showCameraPreview = false
-                            isAnalyzing = true
-                            viewModel.analyzeFoodImage(context, uri)
-                        },
-                        onError = { Log.e("Camera", "View error:", it) }
-                    )
-                }
-            }
+        onDispose {
+            navController.removeOnDestinationChangedListener(listener)
         }
     }
 
-    @Composable
-    fun AnalysisContent(
-        imageUri: Uri?,
-        isAnalyzing: Boolean,
-        analysisResult: String?,
-        onCaptureClick: () -> Unit,
-        onUploadClick: () -> Unit
-    ) {
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            showCameraPreview = true
+        } else {
+            Log.e("AnalysisScreen", "Camera permission denied.")
+        }
+    }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            imageUri = it
+            isAnalyzing = true
+            viewModel.uploadImageToFirebase(it,
+                onSuccess = { downloadUrl ->
+                    viewModel.analyzeFoodImage(context, Uri.parse(downloadUrl))
+                },
+                onFailure = { exception ->
+                    Log.e("AnalysisScreen", "Failed to upload image", exception)
+                }
+            )
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            LargeTopAppBar(
+                title = { Text("Food Analysis") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { navController.navigate("history") }) {
+                        Icon(Icons.Default.History, contentDescription = "History")
+                    }
+                },
+                scrollBehavior = scrollBehavior
+            )
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
         ) {
-            Button(
-                onClick = onCaptureClick,
-                modifier = Modifier.fillMaxWidth()
+            AnimatedVisibility(
+                visible = !showCameraPreview,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
             ) {
-                Icon(Icons.Default.Camera, contentDescription = "Capture")
-                Spacer(Modifier.width(8.dp))
-                Text("Capture Image")
-            }
-
-            Button(
-                onClick = onUploadClick,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(Icons.Default.Upload, contentDescription = "Upload")
-                Spacer(Modifier.width(8.dp))
-                Text("Upload Image")
-            }
-
-            imageUri?.let { uri ->
-                AsyncImage(
-                    model = uri,
-                    contentDescription = "Selected Image",
-                    modifier = Modifier
-                        .size(250.dp)
-                        .clip(RoundedCornerShape(8.dp)),
-                    contentScale = ContentScale.Crop
+                AnalysisContent(
+                    imageUri = imageUri,
+                    isAnalyzing = isAnalyzing,
+                    analysisResult = analysisResult,
+                    onCaptureClick = {
+                        val permission = Manifest.permission.CAMERA
+                        when {
+                            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED -> {
+                                showCameraPreview = true
+                            }
+                            else -> cameraPermissionLauncher.launch(permission)
+                        }
+                    },
+                    onUploadClick = { galleryLauncher.launch("image/*") }
                 )
             }
-            if (isAnalyzing && analysisResult == null) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(50.dp),
-                    color = MaterialTheme.colorScheme.secondary
-                )
-                Text("Analyzing image...", style = MaterialTheme.typography.bodyLarge)
-            }
 
-            analysisResult?.let {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            "Analysis Result",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(it, style = MaterialTheme.typography.bodyMedium)
-                    }
-                }
+            if (showCameraPreview) {
+                CameraPreview(
+                    onImageCaptured = { uri ->
+                        imageUri = uri
+                        showCameraPreview = false
+                        isAnalyzing = true
+                        viewModel.analyzeFoodImage(context, uri)
+                    },
+                    onError = { Log.e("Camera", "View error:", it) }
+                )
             }
         }
     }
+}
 
-    @RequiresApi(Build.VERSION_CODES.P)
-    @Composable
-    fun CameraPreview(
-        onImageCaptured: (Uri) -> Unit,
-        onError: (ImageCaptureException) -> Unit
+@Composable
+fun AnalysisContent(
+    imageUri: Uri?,
+    isAnalyzing: Boolean,
+    analysisResult: String?,
+    onCaptureClick: () -> Unit,
+    onUploadClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val context = LocalContext.current
-        val lifecycleOwner = LocalLifecycleOwner.current
-
-        var previewUseCase by remember { mutableStateOf<Preview?>(null) }
-        val imageCaptureUseCase by remember {
-            mutableStateOf(
-                ImageCapture.Builder()
-            )
+        Button(
+            onClick = onCaptureClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(Icons.Default.Camera, contentDescription = "Capture")
+            Spacer(Modifier.width(8.dp))
+            Text("Capture Image")
         }
 
         Button(
-            onClick = {
-                imageCaptureUseCase.takePicture(
-                    outputOptions,
-                    context.mainExecutor,
-                    object : ImageCapture.OnImageSavedCallback {
-                        override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                            val savedUri = Uri.fromFile(file)
-                            viewModel.uploadImageToFirebase(savedUri,
-                                onSuccess = { downloadUrl ->
-                                    onImageCaptured(Uri.parse(downloadUrl))
-                                },
-                                onFailure = { exception ->
-                                    Log.e("CameraPreview", "Failed to upload image", exception)
-                                    onError(ImageCaptureException("Failed to upload image", exception))
-                                }
-                            )
-                        }
-                    }
-                )
-            },
+            onClick = onUploadClick,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Capture")
+            Icon(Icons.Default.Upload, contentDescription = "Upload")
+            Spacer(Modifier.width(8.dp))
+            Text("Upload Image")
+        }
+
+        imageUri?.let { uri ->
+            AsyncImage(
+                model = uri,
+                contentDescription = "Selected Image",
+                modifier = Modifier
+                    .size(250.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop
+            )
+        }
+        if (isAnalyzing && analysisResult == null) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(50.dp),
+                color = MaterialTheme.colorScheme.secondary
+            )
+            Text("Analyzing image...", style = MaterialTheme.typography.bodyLarge)
+        }
+
+        analysisResult?.let {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        "Analysis Result",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(it, style = MaterialTheme.typography.bodyMedium)
+                }
+            }
         }
     }
-                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                .build()
-        )
-    }
+}
+
+@RequiresApi(Build.VERSION_CODES.P)
+@Composable
+fun CameraPreview(
+    onImageCaptured: (Uri) -> Unit,
+    onError: (ImageCaptureException) -> Unit
+) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    var previewUseCase by remember { mutableStateOf<Preview?>(null) }
+    val imageCaptureUseCase = ImageCapture.Builder()
+        .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+        .build()
 
     var previewView by remember { mutableStateOf<PreviewView?>(null) }
 
@@ -341,9 +310,9 @@ import kotlin.coroutines.suspendCoroutine
 }
 
 suspend fun Context.getCameraProvider(): ProcessCameraProvider = suspendCoroutine { continuation ->
-    val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-
-    cameraProviderFuture.addListener({
-        continuation.resume(cameraProviderFuture.get())
-    }, ContextCompat.getMainExecutor(this))
+    ProcessCameraProvider.getInstance(this).also { cameraProviderFuture ->
+        cameraProviderFuture.addListener({
+            continuation.resume(cameraProviderFuture.get())
+        }, ContextCompat.getMainExecutor(this))
+    }
 }
