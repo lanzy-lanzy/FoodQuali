@@ -20,113 +20,240 @@ package com.food.foodquali.screens
   import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
   import java.text.SimpleDateFormat
   import java.util.*
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun HistoryScreen(navController: NavController) {
+        val viewModel: FoodQualityViewModel = viewModel()
+        val analysisHistory by viewModel.analysisHistory.collectAsState()
+        var isRefreshing by remember { mutableStateOf(false) }
+        var selectedAnalysis by remember { mutableStateOf<Map<String, Any>?>(null) }
+        var showDeleteConfirmation by remember { mutableStateOf(false) }
+        var analysisToDelete by remember { mutableStateOf<Map<String, Any>?>(null) }
 
-  @OptIn(ExperimentalMaterial3Api::class)
-  @Composable
-  fun HistoryScreen(navController: NavController) {
-      val viewModel: FoodQualityViewModel = viewModel()
-      val analysisHistory by viewModel.analysisHistory.collectAsState()
-      var isRefreshing by remember { mutableStateOf(false) }
-      var selectedAnalysis by remember { mutableStateOf<Map<String, Any>?>(null) }
 
-      LaunchedEffect(key1 = Unit) {
-          viewModel.getFoodAnalysisHistory()
-      }
 
-      Scaffold(
-          topBar = {
-              TopAppBar(
-                  title = { Text("Analysis History") },
-                  navigationIcon = {
-                      IconButton(onClick = { navController.navigateUp() }) {
-                          Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                      }
-                  }
-              )
-          }
-      ) { innerPadding ->
-          SwipeRefresh(
-              state = rememberSwipeRefreshState(isRefreshing),
-              onRefresh = {
-                  isRefreshing = true
-                  viewModel.getFoodAnalysisHistory()
-                  isRefreshing = false
-              },
-              modifier = Modifier.fillMaxSize()
-          ) {
-              LazyColumn(
-                  modifier = Modifier
-                      .fillMaxSize()
-                      .padding(innerPadding)
-              ) {
-                  items(analysisHistory.reversed()) { analysis ->
-                      HistoryItem(
-                          analysis = analysis,
-                          onClick = { selectedAnalysis = analysis },
-                          onDelete = {
-                              viewModel.deleteAnalysis(analysis["id"] as String)
-                          }
-                      )
-                  }
-              }
-          }
-      }
 
-      selectedAnalysis?.let { analysis ->
-          AnalysisDetailsDialog(analysis) {
-              selectedAnalysis = null
-          }
-      }
-  }
 
-  @OptIn(ExperimentalMaterial3Api::class)
-  @Composable
-  fun HistoryItem(analysis: Map<String, Any>, onClick: () -> Unit, onDelete: () -> Unit) {
-      Card(
-          modifier = Modifier
-              .fillMaxWidth()
-              .padding(8.dp)
-              .clickable(onClick = onClick),
-          elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-      ) {
-          Row(
-              modifier = Modifier
-                  .padding(16.dp)
-                  .fillMaxWidth(),
-              verticalAlignment = Alignment.CenterVertically
-          ) {
-              AsyncImage(
-                  model = analysis["imageUri"] as String,
-                  contentDescription = "Food Image",
-                  modifier = Modifier
-                      .size(80.dp)
-                      .padding(end = 16.dp),
-                  contentScale = ContentScale.Crop
-              )
-              Column {
-                  Text(
-                      text = "Analysis Result",
-                      style = MaterialTheme.typography.titleMedium
-                  )
-                  Spacer(modifier = Modifier.height(4.dp))
-                  Text(
-                      text = (analysis["result"] as String).take(50) + "...",
-                      style = MaterialTheme.typography.bodyMedium
-                  )
-                  Spacer(modifier = Modifier.height(4.dp))
-                  Text(
-                      text = formatTimestamp(analysis["timestamp"] as Long),
-                      style = MaterialTheme.typography.bodySmall
-                  )
-              }
-            
-              Spacer(modifier = Modifier.weight(1f))
-            
-              IconButton(onClick = onDelete) {
-                  Icon(Icons.Default.Delete, contentDescription = "Delete")
-              }
-          }
-      }
+
+
+
+        LaunchedEffect(key1 = Unit) {
+            viewModel.getFoodAnalysisHistory()
+        }
+
+
+
+
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Analysis History") },
+                    navigationIcon = {
+                        IconButton(onClick = { navController.navigateUp() }) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        }
+                    }
+                )
+            }
+        ) { innerPadding ->
+            SwipeRefresh(
+                state = rememberSwipeRefreshState(isRefreshing),
+                onRefresh = {
+                    isRefreshing = true
+                    viewModel.getFoodAnalysisHistory()
+                    isRefreshing = false
+                },
+                modifier = Modifier.fillMaxSize()
+            ) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                ) {
+                    items(analysisHistory.reversed()) { analysis ->
+                        HistoryItem(
+                            analysis = analysis,
+                            onClick = { selectedAnalysis = analysis },
+                            onDelete = {
+                                analysisToDelete = analysis
+                                showDeleteConfirmation = true
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        selectedAnalysis?.let { analysis ->
+            AnalysisDetailsDialog(analysis) {
+                selectedAnalysis = null
+            }
+        }
+
+
+
+
+
+
+
+        if (showDeleteConfirmation) {
+            AlertDialog(
+                onDismissRequest = { showDeleteConfirmation = false },
+                title = { Text("Confirm Deletion") },
+                text = { Text("Are you sure you want to delete this analysis?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            analysisToDelete?.let {
+                                viewModel.deleteAnalysis(it["id"] as String)
+                            }
+                            showDeleteConfirmation = false
+                        }
+                    ) {
+                        Text("Yes")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDeleteConfirmation = false }) {
+                        Text("No")
+                    }
+                }
+            )
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun HistoryItem(analysis: Map<String, Any>, onClick: () -> Unit, onDelete: () -> Unit) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .clickable(onClick = onClick),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AsyncImage(
+                    model = analysis["imageUri"] as String,
+                    contentDescription = "Food Image",
+                    modifier = Modifier
+                        .size(80.dp)
+                        .padding(end = 16.dp),
+                    contentScale = ContentScale.Crop
+                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Analysis Result",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = (analysis["result"] as String).take(50) + "...",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = formatTimestamp(analysis["timestamp"] as Long),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete")
+                }
+            }
+        }
+    }
   }
 @Composable
 fun AnalysisDetailsDialog(analysis: Map<String, Any>, onDismiss: () -> Unit) {
