@@ -28,7 +28,7 @@ class FoodQualityViewModel : ViewModel() {
             val bitmap = uriToBitmap(context, imageUri)
             val result = GeminiApi.analyzeImage(bitmap)
             _analysisResult.value = result
-            FirebaseData.saveAnalysisResult(imageUri.toString(), result)
+            saveAnalysisResult(imageUri.toString(), result)
         }
     }
 
@@ -40,22 +40,30 @@ class FoodQualityViewModel : ViewModel() {
             ImageDecoder.decodeBitmap(source)
         }
     }
-      private fun getFileProviderAuthority(context: Context): String {
-          return "${context.packageName}.fileprovider"
-      }
 
-      fun createImageUri(context: Context): Uri {
-          val imageFile = File(context.externalCacheDir, "camera_photo.jpg")
-          return FileProvider.getUriForFile(
-              context,
-              getFileProviderAuthority(context),
-              imageFile
-          )
-      }
+    private fun getFileProviderAuthority(context: Context): String {
+        return "${context.packageName}.fileprovider"
+    }
 
-      fun getFoodAnalysisHistory() {
-          viewModelScope.launch {
-              _analysisHistory.value = FirebaseData.getAnalysisHistory()
-          }
-      }
-  }
+    fun createImageUri(context: Context): Uri {
+        val imageFile = File(context.externalCacheDir, "camera_photo.jpg")
+        return FileProvider.getUriForFile(
+            context,
+            getFileProviderAuthority(context),
+            imageFile
+        )
+    }
+
+    fun getFoodAnalysisHistory() {
+        viewModelScope.launch {
+            _analysisHistory.value = FirebaseData.getAnalysisHistory()
+        }
+    }
+
+    private fun saveAnalysisResult(imageUri: String, result: String) {
+        viewModelScope.launch {
+            FirebaseData.saveAnalysisResult(imageUri, result)
+            getFoodAnalysisHistory() // Refresh the history after saving
+        }
+    }
+}

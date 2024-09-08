@@ -109,4 +109,6 @@ dependencies {
 
     // Permissions handling
     implementation("com.google.accompanist:accompanist-permissions:0.31.1-alpha")
+
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.27.0")
 }
