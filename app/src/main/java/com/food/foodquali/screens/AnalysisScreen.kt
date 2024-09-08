@@ -68,18 +68,18 @@ fun AnalysisScreen(navController: NavController) {
     var isAnalyzing by remember { mutableStateOf(false) }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+      LaunchedEffect(navController) {
+          val listener = NavController.OnDestinationChangedListener { _, _, _ ->
+              imageUri = null
+              viewModel.clearAnalysisResult()
+          }
+          navController.addOnDestinationChangedListener(listener)
 
-    LaunchedEffect(navController) {
-        val listener = NavController.OnDestinationChangedListener { _, _, _ ->
-            imageUri = null
-            viewModel.clearAnalysisResult()
-        }
-        navController.addOnDestinationChangedListener(listener)
-
-        // This will be called when the effect is disposed
-        onDispose {
-            navController.removeOnDestinationChangedListener(listener)
-        }
+          // Return the onDispose lambda
+          return@LaunchedEffect {
+              navController.removeOnDestinationChangedListener(listener)
+          }
+      }
     }
 
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
