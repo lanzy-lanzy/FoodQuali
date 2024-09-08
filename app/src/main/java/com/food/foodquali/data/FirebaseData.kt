@@ -25,3 +25,7 @@ object FirebaseData {
         return querySnapshot.documents.mapNotNull { it.data }
     }
 }
+
+suspend fun deleteAnalysisResult(id: String) {
+    analysisCollection.document(id).delete().await()
+}
