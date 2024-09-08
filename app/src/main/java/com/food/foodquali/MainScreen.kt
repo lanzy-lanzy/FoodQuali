@@ -57,7 +57,7 @@ fun MainScreen() {
 }
 
 sealed class Screen(val route: String, val icon: ImageVector) {
-    object Dashboard : Screen("dashboard", Icons.Filled.Dashboard)
-    object Analysis : Screen("analysis", Icons.Filled.Analytics)
-    object History : Screen("history", Icons.Filled.History)
+    object Dashboard : Screen("Dashboard", Icons.Filled.Dashboard)
+    object Analysis : Screen("Analysis", Icons.Filled.Analytics)
+    object History : Screen("History", Icons.Filled.History)
 }
