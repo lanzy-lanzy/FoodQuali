@@ -75,18 +75,21 @@ fun AnalysisScreen(navController: NavController) {
             viewModel.clearAnalysisResult()
         }
         navController.addOnDestinationChangedListener(listener)
-    
+
         // This will be called when the effect is disposed
         onDispose {
             navController.removeOnDestinationChangedListener(listener)
         }
-    }    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
             showCameraPreview = true
         } else {
-            // Handle permission denied
+            // Handle permission denied with UI feedback
+            Log.e("AnalysisScreen", "Camera permission denied.")
         }
     }
 
@@ -298,6 +301,7 @@ fun CameraPreview(
                         override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                             output.savedUri?.let { onImageCaptured(it) }
                         }
+
                         override fun onError(exc: ImageCaptureException) {
                             onError(exc)
                         }
@@ -312,6 +316,7 @@ fun CameraPreview(
         }
     }
 }
+
 suspend fun Context.getCameraProvider(): ProcessCameraProvider = withContext(Dispatchers.Main) {
     suspendCoroutine { continuation ->
         ProcessCameraProvider.getInstance(this@getCameraProvider).also { future ->
