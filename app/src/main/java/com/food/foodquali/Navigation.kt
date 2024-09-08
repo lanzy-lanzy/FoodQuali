@@ -16,8 +16,8 @@ import androidx.navigation.compose.composable
 @Composable
 fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) {
     NavHost(navController = navController, startDestination = "dashboard", modifier = modifier) {
-        composable("dashboard") { DashboardScreen(navController) }
-        composable("analysis") { AnalysisScreen(navController) }
-        composable("history") { HistoryScreen(navController) }
+        composable("Dashboard") { DashboardScreen(navController) }
+        composable("Analysis") { AnalysisScreen(navController) }
+        composable("History") { HistoryScreen(navController) }
     }
 }
