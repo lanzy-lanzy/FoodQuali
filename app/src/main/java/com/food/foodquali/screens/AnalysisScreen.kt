@@ -45,6 +45,7 @@ import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
+
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,17 +60,20 @@ fun AnalysisScreen(navController: NavController) {
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-    LaunchedEffect(navController) {
+    // Use DisposableEffect to manage the lifecycle of the listener
+    DisposableEffect(navController) {
         val listener = NavController.OnDestinationChangedListener { _, _, _ ->
             imageUri = null
             viewModel.clearAnalysisResult()
         }
         navController.addOnDestinationChangedListener(listener)
 
-//        onDispose {
-//            navController.removeOnDestinationChangedListener(listener)
-//        }
+        // Cleanup listener when the composable leaves the composition
+        onDispose {
+            navController.removeOnDestinationChangedListener(listener)
+        }
     }
+
 
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
