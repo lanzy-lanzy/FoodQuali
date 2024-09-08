@@ -89,7 +89,7 @@ package com.food.foodquali.screens
                     TextButton(
                         onClick = {
                             analysisToDelete?.let {
-                                viewModel.deleteAnalysis(it["id"] as String)
+                                viewModel.deleteAnalysis(it["id"] as? String ?: return@let)
                             }
                             showDeleteConfirmation = false
                             analysisToDelete = null

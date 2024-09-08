@@ -70,9 +70,15 @@ fun AnalysisScreen(navController: NavController) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     LaunchedEffect(navController) {
-        navController.addOnDestinationChangedListener { _, _, _ ->
+        val listener = NavController.OnDestinationChangedListener { _, _, _ ->
             imageUri = null
             viewModel.clearAnalysisResult()
+        }
+        navController.addOnDestinationChangedListener(listener)
+        
+        // Remove the listener when the composable is disposed
+        onDispose {
+            navController.removeOnDestinationChangedListener(listener)
         }
     }
 
