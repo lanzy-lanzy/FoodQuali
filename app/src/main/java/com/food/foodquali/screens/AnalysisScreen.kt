@@ -1,6 +1,7 @@
 package com.food.foodquali.screens
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -16,7 +17,6 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.FlowRowScopeInstance.align
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,6 +38,10 @@ import com.food.foodquali.viewmodels.FoodQualityViewModel
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
