@@ -76,12 +76,11 @@ fun AnalysisScreen(navController: NavController) {
         }
         navController.addOnDestinationChangedListener(listener)
     
-        // Return a lambda that will be called when the effect is disposed
-        return@LaunchedEffect {
+        // This will be called when the effect is disposed
+        onDispose {
             navController.removeOnDestinationChangedListener(listener)
         }
-    }
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+    }    val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
