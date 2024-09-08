@@ -21,6 +21,13 @@ import androidx.compose.ui.text.style.TextAlign
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(navController: NavController) {
+    val gradient = Brush.verticalGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.primaryContainer,
+            MaterialTheme.colorScheme.background
+        )
+    )
+
     Scaffold(
         topBar = {
             LargeTopAppBar(
@@ -32,7 +39,7 @@ fun DashboardScreen(navController: NavController) {
                     )
                 },
                 colors = TopAppBarDefaults.largeTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    containerColor = Color.Transparent,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
@@ -41,6 +48,7 @@ fun DashboardScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(gradient)
                 .padding(innerPadding)
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -105,7 +113,7 @@ fun DashboardCard(
             ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
         )
     ) {
         Row(
@@ -118,7 +126,13 @@ fun DashboardCard(
                 imageVector = icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        MaterialTheme.colorScheme.primaryContainer,
+                        shape = CircleShape
+                    )
+                    .padding(8.dp)
             )
             Spacer(Modifier.width(16.dp))
             Column {
