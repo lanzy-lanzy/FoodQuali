@@ -154,6 +154,7 @@ fun CameraPreview(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val coroutineScope = rememberCoroutineScope()
 
     var previewUseCase by remember { mutableStateOf<Preview?>(null) }
     val imageCaptureUseCase by remember {
@@ -168,31 +169,33 @@ fun CameraPreview(
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = { ctx ->
-                val previewView = PreviewView(ctx).apply {
+                PreviewView(ctx).apply {
                     this.scaleType = PreviewView.ScaleType.FILL_CENTER
                 }
-                val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
-                cameraProviderFuture.addListener({
-                    val cameraProvider = cameraProviderFuture.get()
-                    previewUseCase = Preview.Builder().build().also {
-                        it.setSurfaceProvider(previewView.surfaceProvider)
-                    }
+            },
+            update = { previewView ->
+                LaunchedEffect(previewView) {
+                    coroutineScope.launch {
+                        val cameraProvider = context.getCameraProvider()
+                        previewUseCase = Preview.Builder().build().also {
+                            it.setSurfaceProvider(previewView.surfaceProvider)
+                        }
 
-                    val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+                        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
-                    try {
-                        cameraProvider.unbindAll()
-                        cameraProvider.bindToLifecycle(
-                            lifecycleOwner,
-                            cameraSelector,
-                            previewUseCase,
-                            imageCaptureUseCase
-                        )
-                    } catch (e: Exception) {
-                        Log.e("CameraPreview", "Use case binding failed", e)
+                        try {
+                            cameraProvider.unbindAll()
+                            cameraProvider.bindToLifecycle(
+                                lifecycleOwner,
+                                cameraSelector,
+                                previewUseCase,
+                                imageCaptureUseCase
+                            )
+                        } catch (e: Exception) {
+                            Log.e("CameraPreview", "Use case binding failed", e)
+                        }
                     }
-                }, ContextCompat.getMainExecutor(ctx))
-                previewView
+                }
             }
         )
 
@@ -224,4 +227,11 @@ fun CameraPreview(
             Text("Capture")
         }
     }
+}
+
+suspend fun Context.getCameraProvider(): ProcessCameraProvider = suspendCoroutine { continuation ->
+    val listenableFuture = ProcessCameraProvider.getInstance(this)
+    listenableFuture.addListener({
+        continuation.resume(listenableFuture.get())
+    }, ContextCompat.getMainExecutor(this))
 }
