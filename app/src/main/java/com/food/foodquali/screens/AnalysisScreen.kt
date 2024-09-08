@@ -93,6 +93,7 @@ fun AnalysisScreen(navController: NavController) {
                 },
                 onFailure = { exception ->
                     Log.e("AnalysisScreen", "Failed to upload image", exception)
+                    isAnalyzing = false
                 }
             )
         }

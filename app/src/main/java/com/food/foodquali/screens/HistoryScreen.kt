@@ -29,9 +29,9 @@ package com.food.foodquali.screens
         var selectedAnalysis by remember { mutableStateOf<Map<String, Any>?>(null) }
         var showDeleteConfirmation by remember { mutableStateOf(false) }
         var analysisToDelete by remember { mutableStateOf<Map<String, Any>?>(null) }
-
-        LaunchedEffect(key1 = Unit) {
-            viewModel.getFoodAnalysisHistory()
+              LaunchedEffect(key1 = Unit) {
+                  viewModel.getFoodAnalysisHistory()
+              }
         }
 
         Scaffold(
