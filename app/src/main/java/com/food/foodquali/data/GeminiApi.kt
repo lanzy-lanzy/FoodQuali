@@ -34,6 +34,6 @@ object GeminiApi {
     }
 
     private fun formatResponse(text: String): String {
-        return text.replace(Regex("[*•]"), "").trim()
+        return text.replace(Regex("[*•#]"), "").trim()
     }
 }
