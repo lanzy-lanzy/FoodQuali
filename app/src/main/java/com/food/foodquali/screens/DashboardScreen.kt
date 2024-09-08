@@ -11,10 +11,8 @@ import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.History
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.layout.ContentScale
-import com.food.foodquali.R
+import androidx.compose.material.icons.filled.FoodBank
+import androidx.compose.ui.graphics.Color
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,14 +36,15 @@ fun DashboardScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.food_quality),
+            Icon(
+                imageVector = Icons.Filled.FoodBank, // Use the appropriate icon here
                 contentDescription = "Food Quality",
+                tint = Color.Green, // Optional: change the icon color
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
-                contentScale = ContentScale.Crop
+                    .height(200.dp)
             )
+        }
             
             Text(
                 "Welcome to Food Quality Assurance",
@@ -83,4 +82,3 @@ fun DashboardScreen(navController: NavController) {
             }
         }
     }
-}
