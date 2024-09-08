@@ -50,6 +50,28 @@ android {
 }
 
 dependencies {
+    // Compose
+    val compose_version by extra("1.5.1")
+    implementation("androidx.compose.ui:ui:$compose_version")
+    implementation( "androidx.compose.material3:material3:1.3.0")
+    implementation("androidx.compose.ui:ui-tooling-preview:$compose_version")
+    implementation("androidx.compose.material:material-icons-extended:$compose_version")
+    implementation("androidx.compose.material:material:$compose_version")
+
+
+        // Jetpack Compose dependencies
+        implementation ("androidx.compose.ui:ui:1.5.0")               // Core UI components
+        implementation ("androidx.compose.material3:material3:1.2.0")  // Material Design 3
+
+        // Jetpack Compose Navigation dependency
+        implementation ("androidx.navigation:navigation-compose:2.7.0") // Navigation for Compose
+
+        // Accompanist Navigation Animation dependency
+        implementation ("com.google.accompanist:accompanist-navigation-animation:0.31.2-alpha") // For animated navigation
+
+
+
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -60,6 +82,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.vision.internal.vkp)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
