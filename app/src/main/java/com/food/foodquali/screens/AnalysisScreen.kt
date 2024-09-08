@@ -233,9 +233,12 @@ fun CameraPreview(
     }
 }
 
-suspend fun Context.getCameraProvider(): ProcessCameraProvider = suspendCoroutine { continuation ->
-    val listenableFuture = ProcessCameraProvider.getInstance(this)
-    listenableFuture.addListener({
-        continuation.resume(listenableFuture.get())
-    }, ContextCompat.getMainExecutor(this))
+suspend fun Context.getCameraProvider(): ProcessCameraProvider = withContext(Dispatchers.Main) {
+    suspendCoroutine { continuation ->
+        ProcessCameraProvider.getInstance(this@getCameraProvider).also { future ->
+            future.addListener({
+                continuation.resume(future.get())
+            }, ContextCompat.getMainExecutor(this@getCameraProvider))
+        }
+    }
 }
