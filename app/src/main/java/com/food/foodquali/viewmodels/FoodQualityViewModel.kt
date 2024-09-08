@@ -60,24 +60,11 @@ class FoodQualityViewModel : ViewModel() {
         }
     }
 
-    fun analyzeFoodImage(context: Context, imageUri: Uri) {
-        viewModelScope.launch {
-            val bitmap = uriToBitmap(context, imageUri)
-            val result = GeminiApi.analyzeImage(bitmap)
-            _analysisResult.value = result
-            
-            val imageUrl = FirebaseData.uploadImage(imageUri)
-            saveAnalysisResult(imageUrl, result)
-        }
-    }
-
     private fun saveAnalysisResult(imageUrl: String, result: String) {
         viewModelScope.launch {
             FirebaseData.saveAnalysisResult(imageUrl, result)
             getFoodAnalysisHistory()
         }
-    }        }
-    }
     }
 
     fun deleteAnalysis(id: String) {
@@ -92,6 +79,3 @@ class FoodQualityViewModel : ViewModel() {
     }
 }
 
-fun clearAnalysisResult() {
-    _analysisResult.value = null
-}
