@@ -75,13 +75,12 @@ fun AnalysisScreen(navController: NavController) {
             viewModel.clearAnalysisResult()
         }
         navController.addOnDestinationChangedListener(listener)
-        
-        // Remove the listener when the composable is disposed
-        onDispose {
+    
+        // Return a lambda that will be called when the effect is disposed
+        return@LaunchedEffect {
             navController.removeOnDestinationChangedListener(listener)
         }
     }
-
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->

@@ -28,18 +28,18 @@ object FirebaseData {
         val ref = storage.reference.child("food_images/$filename")
         return ref.putFile(imageUri).await().storage.downloadUrl.await().toString()
     }
-}
-suspend fun saveAnalysisResult(imageUrl: String, result: String): String {
-    val analysis = hashMapOf(
-        "imageUrl" to imageUrl,
-        "result" to result,
-        "timestamp" to System.currentTimeMillis()
-    )
-    val docRef = db.collection(COLLECTION_NAME).add(analysis).await()
-    return docRef.id
-}
 
-suspend fun deleteAnalysisResult(id: String) {
-    db.collection(COLLECTION_NAME).document(id).delete().await()
-}
+    suspend fun saveAnalysisResult(imageUrl: String, result: String): String {
+        val analysis = hashMapOf(
+            "imageUrl" to imageUrl,
+            "result" to result,
+            "timestamp" to System.currentTimeMillis()
+        )
+        val docRef = db.collection(COLLECTION_NAME).add(analysis).await()
+        return docRef.id
+    }
 
+    suspend fun deleteAnalysisResult(id: String) {
+        db.collection(COLLECTION_NAME).document(id).delete().await()
+    }
+}

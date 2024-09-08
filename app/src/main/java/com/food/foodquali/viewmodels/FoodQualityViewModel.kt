@@ -83,11 +83,15 @@ class FoodQualityViewModel : ViewModel() {
     fun deleteAnalysis(id: String) {
         viewModelScope.launch {
             FirebaseData.deleteAnalysisResult(id)
-            getFoodAnalysisHistory() // Refresh the list after deletion
+            getFoodAnalysisHistory() // Refresh the history after deletion
         }
     }
 
     fun clearAnalysisResult() {
         _analysisResult.value = null
     }
+}
+
+fun clearAnalysisResult() {
+    _analysisResult.value = null
 }
