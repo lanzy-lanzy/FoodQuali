@@ -9,18 +9,10 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.Image
+import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,10 +36,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.food.foodquali.viewmodels.FoodQualityViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
@@ -76,10 +66,9 @@ fun AnalysisScreen(navController: NavController) {
         }
         navController.addOnDestinationChangedListener(listener)
 
-        // Return the onDispose lambda
-        return@LaunchedEffect {
-            navController.removeOnDestinationChangedListener(listener)
-        }
+//        onDispose {
+//            navController.removeOnDestinationChangedListener(listener)
+//        }
     }
 
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
@@ -88,13 +77,10 @@ fun AnalysisScreen(navController: NavController) {
         if (isGranted) {
             showCameraPreview = true
         } else {
-            // Handle permission denied with UI feedback
+            // Handle permission denied
             Log.e("AnalysisScreen", "Camera permission denied.")
         }
     }
-
-    // Rest of the code remains the same
-}
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -302,7 +288,8 @@ fun CameraPreview(
                     context.mainExecutor,
                     object : ImageCapture.OnImageSavedCallback {
                         override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                            output.savedUri?.let { onImageCaptured(it) }
+                            val savedUri = Uri.fromFile(file)
+                            onImageCaptured(savedUri)
                         }
 
                         override fun onError(exc: ImageCaptureException) {
@@ -313,19 +300,17 @@ fun CameraPreview(
             },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp)
+                .padding(16.dp)
         ) {
             Text("Capture")
         }
     }
 }
 
-suspend fun Context.getCameraProvider(): ProcessCameraProvider = withContext(Dispatchers.Main) {
-    suspendCoroutine { continuation ->
-        ProcessCameraProvider.getInstance(this@getCameraProvider).also { future ->
-            future.addListener({
-                continuation.resume(future.get())
-            }, ContextCompat.getMainExecutor(this@getCameraProvider))
-        }
-    }
+suspend fun Context.getCameraProvider(): ProcessCameraProvider = suspendCoroutine { continuation ->
+    val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+
+    cameraProviderFuture.addListener({
+        continuation.resume(cameraProviderFuture.get())
+    }, ContextCompat.getMainExecutor(this))
 }
