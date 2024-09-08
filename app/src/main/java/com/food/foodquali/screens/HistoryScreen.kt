@@ -25,6 +25,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Dialog
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -166,26 +170,29 @@ fun HistoryItem(analysis: Map<String, Any>, onClick: () -> Unit, onDelete: () ->
 
 @Composable
 fun AnalysisDetailsDialog(analysis: Map<String, Any>, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = null,
-        text = {
-            Column {
-                // Sticky top
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 8.dp
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+            ) {
                 Text(
                     "Analysis Details",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(bottom = 16.dp)
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
                 
-                // Scrollable content
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(400.dp) // Adjust height as needed
+                        .height(400.dp)
+                        .clip(RoundedCornerShape(8.dp))
                 ) {
                     Column(
                         modifier = Modifier
@@ -197,26 +204,36 @@ fun AnalysisDetailsDialog(analysis: Map<String, Any>, onDismiss: () -> Unit) {
                             contentDescription = "Food Image",
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(200.dp),
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(8.dp)),
                             contentScale = ContentScale.Crop
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text(analysis["result"] as? String ?: "")
+                        Text(
+                            analysis["result"] as? String ?: "",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = formatTimestamp(analysis["timestamp"] as? Long ?: 0L),
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Close")
+                
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(top = 16.dp, bottom = 8.dp)
+                ) {
+                    Text("Close")
+                }
             }
         }
-    )
+    }
 }
 
 fun formatTimestamp(timestamp: Long): String {
