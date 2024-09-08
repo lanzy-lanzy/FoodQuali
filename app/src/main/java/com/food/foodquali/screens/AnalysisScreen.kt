@@ -200,7 +200,7 @@ fun AnalysisContent(
             )
         }
 
-        if (isAnalyzing) {
+        if (isAnalyzing && analysisResult == null) {
             CircularProgressIndicator(
                 modifier = Modifier.size(50.dp),
                 color = MaterialTheme.colorScheme.secondary
