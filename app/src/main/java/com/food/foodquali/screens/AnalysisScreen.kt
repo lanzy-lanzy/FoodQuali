@@ -164,60 +164,64 @@ fun CameraPreview(
         )
     }
 
-    AndroidView(
-        modifier = Modifier.fillMaxSize(),
-        factory = { ctx ->
-            val previewView = PreviewView(ctx).apply {
-                this.scaleType = PreviewView.ScaleType.FILL_CENTER
+    Box(modifier = Modifier.fillMaxSize()) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { ctx ->
+                val previewView = PreviewView(ctx).apply {
+                    this.scaleType = PreviewView.ScaleType.FILL_CENTER
+                }
+                val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
+                cameraProviderFuture.addListener({
+                    val cameraProvider = cameraProviderFuture.get()
+                    previewUseCase = Preview.Builder().build().also {
+                        it.setSurfaceProvider(previewView.surfaceProvider)
+                    }
+
+                    val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+                    try {
+                        cameraProvider.unbindAll()
+                        cameraProvider.bindToLifecycle(
+                            lifecycleOwner,
+                            cameraSelector,
+                            previewUseCase,
+                            imageCaptureUseCase
+                        )
+                    } catch (e: Exception) {
+                        Log.e("CameraPreview", "Use case binding failed", e)
+                    }
+                }, ContextCompat.getMainExecutor(ctx))
+                previewView
             }
-            val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
-            cameraProviderFuture.addListener({
-                val cameraProvider = cameraProviderFuture.get()
-                previewUseCase = Preview.Builder().build().also {
-                    it.setSurfaceProvider(previewView.surfaceProvider)
-                }
+        )
 
-                val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
-                try {
-                    cameraProvider.unbindAll()
-                    cameraProvider.bindToLifecycle(
-                        lifecycleOwner,
-                        cameraSelector,
-                        previewUseCase,
-                        imageCaptureUseCase
-                    )
-                } catch (e: Exception) {
-                    Log.e("CameraPreview", "Use case binding failed", e)
-                }
-            }, ContextCompat.getMainExecutor(ctx))
-            previewView
+        Button(
+            onClick = {
+                val file = File(
+                    context.externalMediaDirs.firstOrNull(),
+                    SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US)
+                        .format(System.currentTimeMillis()) + ".jpg"
+                )
+                val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
+                imageCaptureUseCase.takePicture(
+                    outputOptions,
+                    context.mainExecutor,
+                    object : ImageCapture.OnImageSavedCallback {
+                        override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                            output.savedUri?.let { onImageCaptured(it) }
+                        }
+                        override fun onError(exc: ImageCaptureException) {
+                            onError(exc)
+                        }
+                    }
+                )
+            },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 16.dp)
+        ) {
+            Text("Capture")
         }
-    )
-
-    Button(
-        onClick = {
-            val file = File(
-                context.externalMediaDirs.firstOrNull(),
-                SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US)
-                    .format(System.currentTimeMillis()) + ".jpg"
-            )
-            val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
-            imageCaptureUseCase.takePicture(
-                outputOptions,
-                context.mainExecutor,
-                object : ImageCapture.OnImageSavedCallback {
-                    override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                        output.savedUri?.let { onImageCaptured(it) }
-                    }
-                    override fun onError(exc: ImageCaptureException) {
-                        onError(exc)
-                    }
-                }
-            )
-        },
-        modifier = Modifier.align(Alignment.BottomCenter)
-    ) {
-        Text("Capture")
     }
 }
