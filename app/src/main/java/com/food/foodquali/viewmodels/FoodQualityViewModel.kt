@@ -40,21 +40,18 @@ class FoodQualityViewModel : ViewModel() {
             ImageDecoder.decodeBitmap(source)
         }
     }
+      private fun getFileProviderAuthority(context: Context): String {
+          return "${context.packageName}.fileprovider"
+      }
 
-    fun createImageUri(context: Context): Uri {
-        val directory = File(context.cacheDir, "images")
-        directory.mkdirs()
-        val file = File.createTempFile(
-            "selected_image_",
-            ".jpg",
-            directory
-        )
-        val authority = "${context.packageName}.fileprovider"
-        return FileProvider.getUriForFile(
-            context,
-            authority,
-            file
-        )
+      fun createImageUri(context: Context): Uri {
+          val imageFile = File(context.externalCacheDir, "camera_photo.jpg")
+          return FileProvider.getUriForFile(
+              context,
+              getFileProviderAuthority(context),
+              imageFile
+          )
+      }
     }
 
     fun getFoodAnalysisHistory() {
