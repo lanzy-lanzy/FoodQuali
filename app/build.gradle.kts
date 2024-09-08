@@ -51,6 +51,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.generativeai)
     // Compose
     val compose_version by extra("1.5.1")
     implementation("androidx.compose.ui:ui:$compose_version")
@@ -74,7 +76,8 @@ dependencies {
     //firebase
     implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
 
-
+    //coil
+    implementation("io.coil-kt:coil-compose:2.4.0")
 
 
 
