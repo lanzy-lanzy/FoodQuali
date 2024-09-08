@@ -82,22 +82,23 @@ fun AnalysisScreen(navController: NavController) {
     }
 
     val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            imageUri = it
-            isAnalyzing = true
-            viewModel.uploadImageToFirebase(it,
-                onSuccess = { downloadUrl ->
-                    viewModel.analyzeFoodImage(context, Uri.parse(downloadUrl))
-                },
-                onFailure = { exception ->
-                    Log.e("AnalysisScreen", "Failed to upload image", exception)
-                    isAnalyzing = false
-                }
-            )
-        }
+    contract = ActivityResultContracts.GetContent()
+) { uri: Uri? ->
+    uri?.let {
+        imageUri = it
+        isAnalyzing = true
+        viewModel.uploadImageToFirebase(it,
+            onSuccess = { downloadUrl ->
+                viewModel.analyzeFoodImage(context, Uri.parse(downloadUrl))
+            },
+            onFailure = { exception ->
+                Log.e("AnalysisScreen", "Failed to upload image", exception)
+                isAnalyzing = false
+            }
+        )
     }
+}
+
 
     Scaffold(
         topBar = {
