@@ -127,7 +127,7 @@ package com.food.foodquali.screens
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AsyncImage(
-                    model = analysis["imageUrl"] as String,
+                    model = analysis["imageUrl"] as? String,
                     contentDescription = "Food Image",
                     modifier = Modifier
                         .size(80.dp)
@@ -156,6 +156,7 @@ package com.food.foodquali.screens
             }
         }
     }
+
 @Composable
 fun AnalysisDetailsDialog(analysis: Map<String, Any>, onDismiss: () -> Unit) {
     AlertDialog(
@@ -164,7 +165,7 @@ fun AnalysisDetailsDialog(analysis: Map<String, Any>, onDismiss: () -> Unit) {
         text = {
             Column {
                 AsyncImage(
-                    model = analysis["imageUrl"] as String,
+                    model = analysis["imageUrl"] as? String,
                     contentDescription = "Food Image",
                     modifier = Modifier
                         .fillMaxWidth()

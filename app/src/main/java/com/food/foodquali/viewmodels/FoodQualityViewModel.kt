@@ -73,9 +73,10 @@ class FoodQualityViewModel : ViewModel() {
 
     private fun saveAnalysisResult(imageUrl: String, result: String) {
         viewModelScope.launch {
-            val id = FirebaseData.saveAnalysisResult(imageUrl, result)
+            FirebaseData.saveAnalysisResult(imageUrl, result)
             getFoodAnalysisHistory()
         }
+    }        }
     }
     }
 

@@ -3,7 +3,6 @@ package com.food.foodquali.data
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import com.google.firebase.storage.FirebaseStorage
-import java.io.File
 import android.net.Uri
 
 object FirebaseData {
@@ -27,7 +26,7 @@ object FirebaseData {
         val ref = storage.reference.child("food_images/$filename")
         return ref.putFile(imageUri).await().storage.downloadUrl.await().toString()
     }
-
+}
     suspend fun saveAnalysisResult(imageUrl: String, result: String): String {
         val analysis = hashMapOf(
             "imageUrl" to imageUrl,

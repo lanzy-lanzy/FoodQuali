@@ -188,16 +188,17 @@ fun AnalysisContent(
             Spacer(Modifier.width(8.dp))
             Text("Upload Image")
         }
-          imageUri?.let { uri ->
-              AsyncImage(
-                  model = uri,
-                  contentDescription = "Selected Image",
-                  modifier = Modifier
-                      .size(250.dp)
-                      .clip(RoundedCornerShape(8.dp)),
-                  contentScale = ContentScale.Crop
-              )
-          }
+
+        imageUri?.let { uri ->
+            AsyncImage(
+                model = uri,
+                contentDescription = "Selected Image",
+                modifier = Modifier
+                    .size(250.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop
+            )
+        }
         if (isAnalyzing && analysisResult == null) {
             CircularProgressIndicator(
                 modifier = Modifier.size(50.dp),
