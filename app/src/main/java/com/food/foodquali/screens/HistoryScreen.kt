@@ -30,19 +30,9 @@ package com.food.foodquali.screens
         var showDeleteConfirmation by remember { mutableStateOf(false) }
         var analysisToDelete by remember { mutableStateOf<Map<String, Any>?>(null) }
 
-
-
-
-
-
-
-
         LaunchedEffect(key1 = Unit) {
             viewModel.getFoodAnalysisHistory()
         }
-
-
-
 
         Scaffold(
             topBar = {
@@ -84,55 +74,11 @@ package com.food.foodquali.screens
             }
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         selectedAnalysis?.let { analysis ->
             AnalysisDetailsDialog(analysis) {
                 selectedAnalysis = null
             }
         }
-
-
-
-
-
-
 
         if (showDeleteConfirmation) {
             AlertDialog(
@@ -159,54 +105,6 @@ package com.food.foodquali.screens
             )
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
