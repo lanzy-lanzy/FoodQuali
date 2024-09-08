@@ -25,11 +25,15 @@ object GeminiApi {
                 4. Suggestions for improvement
                 5. Recommendations for storage or consumption
 
-                Please format the response in clear, separate sections.
+                Please format the response in clear, separate sections without using asterisks or bullet points. Use formal language and complete sentences.
             """.trimIndent())
         }
 
         val response = generativeModel.generateContent(inputContent)
-        response.text ?: "Unable to analyze the image."
+        response.text?.let { formatResponse(it) } ?: "Unable to analyze the image."
+    }
+
+    private fun formatResponse(text: String): String {
+        return text.replace(Regex("[*•]"), "").trim()
     }
 }
