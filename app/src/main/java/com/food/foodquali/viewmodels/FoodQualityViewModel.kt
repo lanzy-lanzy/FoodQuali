@@ -23,6 +23,8 @@ class FoodQualityViewModel : ViewModel() {
     private val _analysisHistory = MutableStateFlow<List<Map<String, Any>>>(emptyList())
     val analysisHistory = _analysisHistory.asStateFlow()
 
+    private val storage = FirebaseStorage.getInstance()
+
     fun analyzeFoodImage(context: Context, imageUri: Uri) {
         viewModelScope.launch {
             val bitmap = uriToBitmap(context, imageUri)
@@ -77,5 +79,20 @@ class FoodQualityViewModel : ViewModel() {
     fun clearAnalysisResult() {
         _analysisResult.value = null
     }
-}
 
+    fun uploadImageToFirebase(uri: Uri, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
+        val timestamp = System.currentTimeMillis()
+        val imageName = "food_image_$timestamp.jpg"
+        val imageRef = storage.reference.child("images/$imageName")
+
+        imageRef.putFile(uri)
+            .addOnSuccessListener { taskSnapshot ->
+                imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                    onSuccess(downloadUri.toString())
+                }
+            }
+            .addOnFailureListener { exception ->
+                onFailure(exception)
+            }
+    }
+}
