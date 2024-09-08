@@ -241,3 +241,41 @@ suspend fun Context.getCameraProvider(): ProcessCameraProvider = withContext(Dis
         }
     }
 }
+
+fun deleteAnalysis(analysis: Map<String, Any>) {
+    viewModelScope.launch {
+        val id = analysis["id"] as? String
+        if (id != null) {
+            FirebaseData.deleteAnalysisResult(id)
+            getFoodAnalysisHistory() // Refresh the list after deletion
+        } else {
+            // Handle the case where id is missing
+            // You might want to show an error message to the user
+        }
+    }
+}
+
+if (showDeleteConfirmation) {
+    AlertDialog(
+        onDismissRequest = { showDeleteConfirmation = false },
+        title = { Text("Confirm Deletion") },
+        text = { Text("Are you sure you want to delete this analysis?") },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    analysisToDelete?.let {
+                        viewModel.deleteAnalysis(it)
+                    }
+                    showDeleteConfirmation = false
+                }
+            ) {
+                Text("Yes")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { showDeleteConfirmation = false }) {
+                Text("No")
+            }
+        }
+    )
+}
