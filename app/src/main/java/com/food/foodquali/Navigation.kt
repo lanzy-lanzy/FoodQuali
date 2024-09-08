@@ -2,7 +2,6 @@ package com.food.foodquali
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -14,20 +13,6 @@ import com.food.foodquali.screens.HistoryScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-  import android.os.Build
-  import androidx.annotation.RequiresApi
-  import androidx.compose.animation.ExperimentalAnimationApi
-  import androidx.compose.animation.core.tween
-  import androidx.compose.animation.fadeIn
-  import androidx.compose.animation.fadeOut
-  import androidx.compose.runtime.Composable
-  import androidx.compose.ui.Modifier
-  import com.food.foodquali.screens.AnalysisScreen
-  import com.food.foodquali.screens.DashboardScreen
-  import com.food.foodquali.screens.HistoryScreen
-  import androidx.navigation.NavHostController
-  import androidx.navigation.compose.NavHost
-  import androidx.navigation.compose.composable
   import androidx.compose.material3.Icon
   import androidx.compose.material3.NavigationBar
   import androidx.compose.material3.NavigationBarItem
@@ -35,7 +20,6 @@ import androidx.navigation.compose.composable
   import androidx.compose.runtime.getValue
   import androidx.navigation.compose.currentBackStackEntryAsState
   import androidx.compose.material3.Scaffold
-  import androidx.compose.ui.unit.dp
   import androidx.compose.foundation.layout.padding
   import androidx.compose.material.icons.Icons
   import androidx.compose.material.icons.filled.Dashboard
