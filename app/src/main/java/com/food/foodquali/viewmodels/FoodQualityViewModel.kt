@@ -52,11 +52,10 @@ class FoodQualityViewModel : ViewModel() {
               imageFile
           )
       }
-    }
 
-    fun getFoodAnalysisHistory() {
-        viewModelScope.launch {
-            _analysisHistory.value = FirebaseData.getAnalysisHistory()
-        }
-    }
-}
+      fun getFoodAnalysisHistory() {
+          viewModelScope.launch {
+              _analysisHistory.value = FirebaseData.getAnalysisHistory()
+          }
+      }
+  }}
