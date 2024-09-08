@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1092038158346",
+    "project_id": "foodquali-77730",
+    "storage_bucket": "foodquali-77730.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1092038158346:android:f1afce60cff2ab27db57f3",
+        "android_client_info": {
+          "package_name": "com.food.foodquali"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAat1h7HW6ltuv2rv4cxIKQJBO93_7L_oU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

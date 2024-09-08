@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -70,7 +71,8 @@ dependencies {
         implementation ("com.google.accompanist:accompanist-navigation-animation:0.31.2-alpha") // For animated navigation
 
 
-
+    //firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
 
 
     implementation(libs.androidx.core.ktx)
