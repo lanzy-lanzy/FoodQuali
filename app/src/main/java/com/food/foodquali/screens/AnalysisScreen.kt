@@ -87,9 +87,10 @@ fun AnalysisScreen(navController: NavController) {
         uri?.let {
             imageUri = it
             isAnalyzing = true
-            viewModel.uploadImageToFirebase(it,
+            viewModel.uploadImageToFirebase(uri,
                 onSuccess = { downloadUrl ->
                     viewModel.analyzeFoodImage(context, Uri.parse(downloadUrl))
+                    viewModel.saveFoodAnalysis(downloadUrl, analysisResult)
                 },
                 onFailure = { exception ->
                     Log.e("AnalysisScreen", "Failed to upload image", exception)
@@ -315,5 +316,28 @@ suspend fun Context.getCameraProvider(): ProcessCameraProvider = suspendCoroutin
         cameraProviderFuture.addListener({
             continuation.resume(cameraProviderFuture.get())
         }, ContextCompat.getMainExecutor(this))
+    }
+}
+
+fun saveFoodAnalysis(imageUrl: String, result: String) {
+    viewModelScope.launch {
+        val analysis = mapOf(
+            "id" to UUID.randomUUID().toString(),
+            "imageUrl" to imageUrl,
+            "result" to result,
+            "timestamp" to System.currentTimeMillis()
+        )
+        firestore.collection("food_analyses").add(analysis)
+    }
+}
+
+fun getFoodAnalysisHistory() {
+    viewModelScope.launch {
+        firestore.collection("food_analyses")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { documents ->
+                _analysisHistory.value = documents.map { it.data }
+            }
     }
 }
