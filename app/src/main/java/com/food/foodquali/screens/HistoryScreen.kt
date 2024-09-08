@@ -152,7 +152,6 @@ package com.food.foodquali.screens
             }
         }
     }
-  }
 @Composable
 fun AnalysisDetailsDialog(analysis: Map<String, Any>, onDismiss: () -> Unit) {
     AlertDialog(
