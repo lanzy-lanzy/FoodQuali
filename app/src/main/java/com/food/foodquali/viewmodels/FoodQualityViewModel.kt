@@ -74,3 +74,7 @@ class FoodQualityViewModel : ViewModel() {
     }
     
 }
+
+fun clearAnalysisResult() {
+    _analysisResult.value = null
+}
