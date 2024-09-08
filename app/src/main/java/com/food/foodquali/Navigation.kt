@@ -15,9 +15,15 @@ import androidx.navigation.compose.composable
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = "dashboard", modifier = modifier) {
-        composable("Dashboard") { DashboardScreen(navController) }
-        composable("Analysis") { AnalysisScreen(navController) }
-        composable("History") { HistoryScreen(navController) }
+    NavHost(
+        navController = navController,
+        startDestination = "dashboard",
+        modifier = modifier,
+        enterTransition = { fadeIn(animationSpec = tween(300)) },
+        exitTransition = { fadeOut(animationSpec = tween(300)) }
+    ) {
+        composable("dashboard") { DashboardScreen(navController) }
+        composable("analysis") { AnalysisScreen(navController) }
+        composable("history") { HistoryScreen(navController) }
     }
 }
