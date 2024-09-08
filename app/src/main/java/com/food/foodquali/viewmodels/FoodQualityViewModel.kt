@@ -58,4 +58,4 @@ class FoodQualityViewModel : ViewModel() {
               _analysisHistory.value = FirebaseData.getAnalysisHistory()
           }
       }
-  }}
+  }
