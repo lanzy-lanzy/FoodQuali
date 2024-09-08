@@ -53,6 +53,7 @@ android {
 dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.generativeai)
+    implementation(libs.firebase.storage.ktx)
     // Compose
     val compose_version by extra("1.5.1")
     implementation("androidx.compose.ui:ui:$compose_version")
