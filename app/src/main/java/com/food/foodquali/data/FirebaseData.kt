@@ -7,13 +7,14 @@ object FirebaseData {
     private val db = FirebaseFirestore.getInstance()
     private const val COLLECTION_NAME = "food_analysis"
 
-    suspend fun saveAnalysisResult(imageUri: String, result: String) {
+    suspend fun saveAnalysisResult(imageUri: String, result: String): String {
         val analysis = hashMapOf(
             "imageUri" to imageUri,
             "result" to result,
             "timestamp" to System.currentTimeMillis()
         )
-        db.collection(COLLECTION_NAME).add(analysis).await()
+        val docRef = db.collection(COLLECTION_NAME).add(analysis).await()
+        return docRef.id
     }
 
     suspend fun getAnalysisHistory(): List<Map<String, Any>> {
@@ -22,10 +23,8 @@ object FirebaseData {
             .limit(10)
             .get()
             .await()
-        return querySnapshot.documents.mapNotNull { it.data }
-    }
-
-    suspend fun deleteAnalysisResult(id: String) {
-        db.collection(COLLECTION_NAME).document(id).delete().await()
+        return querySnapshot.documents.map { 
+            it.data?.plus("id" to it.id) ?: emptyMap()
+        }
     }
 }

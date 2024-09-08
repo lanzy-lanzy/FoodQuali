@@ -92,13 +92,17 @@ package com.food.foodquali.screens
                                 viewModel.deleteAnalysis(it["id"] as String)
                             }
                             showDeleteConfirmation = false
+                            analysisToDelete = null
                         }
                     ) {
                         Text("Yes")
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDeleteConfirmation = false }) {
+                    TextButton(onClick = { 
+                        showDeleteConfirmation = false
+                        analysisToDelete = null
+                    }) {
                         Text("No")
                     }
                 }
