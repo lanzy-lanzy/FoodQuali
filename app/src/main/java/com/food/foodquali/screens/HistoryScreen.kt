@@ -21,6 +21,11 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -163,24 +168,47 @@ fun HistoryItem(analysis: Map<String, Any>, onClick: () -> Unit, onDelete: () ->
 fun AnalysisDetailsDialog(analysis: Map<String, Any>, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Analysis Details") },
+        title = null,
         text = {
             Column {
-                AsyncImage(
-                    model = analysis["imageUrl"] as? String,
-                    contentDescription = "Food Image",
+                // Sticky top
+                Text(
+                    "Analysis Details",
+                    style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp),
-                    contentScale = ContentScale.Crop
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(bottom = 16.dp)
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(analysis["result"] as? String ?: "")
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = formatTimestamp(analysis["timestamp"] as? Long ?: 0L),
-                    style = MaterialTheme.typography.bodySmall
-                )
+                
+                // Scrollable content
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(400.dp) // Adjust height as needed
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        AsyncImage(
+                            model = analysis["imageUrl"] as? String,
+                            contentDescription = "Food Image",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            contentScale = ContentScale.Crop
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(analysis["result"] as? String ?: "")
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = formatTimestamp(analysis["timestamp"] as? Long ?: 0L),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
             }
         },
         confirmButton = {
