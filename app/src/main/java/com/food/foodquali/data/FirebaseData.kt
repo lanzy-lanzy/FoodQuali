@@ -1,11 +1,13 @@
 package com.food.foodquali.data
 
+import android.annotation.SuppressLint
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import com.google.firebase.storage.FirebaseStorage
 import android.net.Uri
 
 object FirebaseData {
+    @SuppressLint("StaticFieldLeak")
     private val db = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
     private const val COLLECTION_NAME = "food_analysis"
