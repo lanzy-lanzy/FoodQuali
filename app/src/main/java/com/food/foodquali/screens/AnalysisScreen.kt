@@ -13,6 +13,7 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,9 +28,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -37,8 +41,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.food.foodquali.viewmodels.FoodQualityViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -58,6 +60,13 @@ fun AnalysisScreen(navController: NavController) {
     var isAnalyzing by remember { mutableStateOf(false) }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
+    val backgroundGradient = Brush.verticalGradient(
+        colors = listOf(
+            Color(0xFFFFF3E0),  // Light cream
+            Color(0xFFFFE0B2)   // Warm peach
+        )
+    )
 
     DisposableEffect(navController) {
         val listener = NavController.OnDestinationChangedListener { _, _, _ ->
@@ -82,80 +91,103 @@ fun AnalysisScreen(navController: NavController) {
     }
 
     val galleryLauncher = rememberLauncherForActivityResult(
-    contract = ActivityResultContracts.GetContent()
-) { uri: Uri? ->
-    uri?.let {
-        imageUri = it
-        isAnalyzing = true
-        viewModel.uploadImageToFirebase(it,
-            onSuccess = { downloadUrl ->
-                viewModel.analyzeFoodImage(context, Uri.parse(downloadUrl))
-            },
-            onFailure = { exception ->
-                Log.e("AnalysisScreen", "Failed to upload image", exception)
-                isAnalyzing = false
-            }
-        )
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            imageUri = it
+            isAnalyzing = true
+            viewModel.uploadImageToFirebase(it,
+                onSuccess = { downloadUrl ->
+                    viewModel.analyzeFoodImage(context, Uri.parse(downloadUrl))
+                },
+                onFailure = { exception ->
+                    Log.e("AnalysisScreen", "Failed to upload image", exception)
+                    isAnalyzing = false
+                }
+            )
+        }
     }
-}
-
 
     Scaffold(
         topBar = {
             LargeTopAppBar(
-                title = { Text("Food Analysis") },
+                title = {
+                    Text(
+                        "Food Analysis",
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF5D4037)  // Deep brown
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color(0xFF5D4037)  // Deep brown
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = { navController.navigate("history") }) {
-                        Icon(Icons.Default.History, contentDescription = "History")
+                        Icon(
+                            Icons.Default.History,
+                            contentDescription = "History",
+                            tint = Color(0xFF5D4037)  // Deep brown
+                        )
                     }
                 },
+                colors = TopAppBarDefaults.largeTopAppBarColors(
+                    containerColor = Color(0xFFFFE0B2).copy(alpha = 0.7f),
+                    titleContentColor = Color(0xFF5D4037)
+                ),
                 scrollBehavior = scrollBehavior
             )
         }
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
+                .background(backgroundGradient)
         ) {
-            AnimatedVisibility(
-                visible = !showCameraPreview,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .verticalScroll(rememberScrollState())
             ) {
-                AnalysisContent(
-                    imageUri = imageUri,
-                    isAnalyzing = isAnalyzing,
-                    analysisResult = analysisResult,
-                    onCaptureClick = {
-                        val permission = Manifest.permission.CAMERA
-                        when {
-                            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED -> {
-                                showCameraPreview = true
+                AnimatedVisibility(
+                    visible = !showCameraPreview,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
+                    AnalysisContent(
+                        imageUri = imageUri,
+                        isAnalyzing = isAnalyzing,
+                        analysisResult = analysisResult,
+                        onCaptureClick = {
+                            val permission = Manifest.permission.CAMERA
+                            when {
+                                ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED -> {
+                                    showCameraPreview = true
+                                }
+                                else -> cameraPermissionLauncher.launch(permission)
                             }
-                            else -> cameraPermissionLauncher.launch(permission)
-                        }
-                    },
-                    onUploadClick = { galleryLauncher.launch("image/*") }
-                )
-            }
+                        },
+                        onUploadClick = { galleryLauncher.launch("image/*") }
+                    )
+                }
 
-            if (showCameraPreview) {
-                CameraPreview(
-                    onImageCaptured = { uri ->
-                        imageUri = uri
-                        showCameraPreview = false
-                        isAnalyzing = true
-                        viewModel.analyzeFoodImage(context, uri)
-                    },
-                    onError = { Log.e("Camera", "View error:", it) }
-                )
+                if (showCameraPreview) {
+                    CameraPreview(
+                        onImageCaptured = { uri ->
+                            imageUri = uri
+                            showCameraPreview = false
+                            isAnalyzing = true
+                            viewModel.analyzeFoodImage(context, uri)
+                        },
+                        onError = { Log.e("Camera", "View error:", it) }
+                    )
+                }
             }
         }
     }
@@ -178,20 +210,22 @@ fun AnalysisContent(
     ) {
         Button(
             onClick = onCaptureClick,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD84315))  // Warm orange
         ) {
             Icon(Icons.Default.Camera, contentDescription = "Capture")
             Spacer(Modifier.width(8.dp))
-            Text("Capture Image")
+            Text("Capture Image", color = Color.White)
         }
 
         Button(
             onClick = onUploadClick,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD84315))  // Warm orange
         ) {
             Icon(Icons.Default.Upload, contentDescription = "Upload")
             Spacer(Modifier.width(8.dp))
-            Text("Upload Image")
+            Text("Upload Image", color = Color.White)
         }
 
         imageUri?.let { uri ->
@@ -200,36 +234,47 @@ fun AnalysisContent(
                 contentDescription = "Selected Image",
                 modifier = Modifier
                     .size(250.dp)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .clip(RoundedCornerShape(16.dp)),
                 contentScale = ContentScale.Crop
             )
         }
         if (isAnalyzing && analysisResult == null) {
             CircularProgressIndicator(
                 modifier = Modifier.size(50.dp),
-                color = MaterialTheme.colorScheme.secondary
+                color = Color(0xFFD84315)  // Warm orange
             )
-            Text("Analyzing image...", style = MaterialTheme.typography.bodyLarge)
+            Text(
+                "Analyzing baked goods...",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color(0xFF5D4037)  // Deep brown
+            )
         }
 
         analysisResult?.let {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF8E1))  // Light wheat
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         "Analysis Result",
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary
+                        color = Color(0xFFD84315),  // Warm orange
+                        fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(it, style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF5D4037)  // Deep brown
+                    )
                 }
             }
         }
     }
 }
+
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
