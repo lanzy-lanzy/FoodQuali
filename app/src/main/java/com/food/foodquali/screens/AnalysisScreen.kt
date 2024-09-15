@@ -244,7 +244,7 @@ fun AnalysisContent(
                 color = Color(0xFFD84315)  // Warm orange
             )
             Text(
-                "Analyzing baked goods...",
+                "Analyzing food now...",
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color(0xFF5D4037)  // Deep brown
             )
