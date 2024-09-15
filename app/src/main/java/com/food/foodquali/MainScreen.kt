@@ -27,7 +27,10 @@ fun MainScreen() {
     
     Scaffold(
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = Color(0xFFF5E0B3), // Warm, light wheat color
+                contentColor = Color(0xFF8B4513)    // Saddle brown for text and icons
+            ) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
                 listOf(
@@ -47,7 +50,14 @@ fun MainScreen() {
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                        }
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Color(0xFFD84315),    // Warm orange for selected icon
+                            selectedTextColor = Color(0xFFD84315),    // Warm orange for selected text
+                            unselectedIconColor = Color(0xFF8B4513),  // Saddle brown for unselected icon
+                            unselectedTextColor = Color(0xFF8B4513),  // Saddle brown for unselected text
+                            indicatorColor = Color(0xFFFFE0B2)        // Light peach for the selection indicator
+                        )
                     )
                 }
             }
@@ -56,7 +66,6 @@ fun MainScreen() {
         Navigation(navController, Modifier.padding(innerPadding))
     }
 }
-
 sealed class Screen(val route: String, val icon: ImageVector) {
     object Dashboard : Screen("Dashboard", Icons.Filled.Dashboard)
     object Analysis : Screen("Analysis", Icons.Filled.Analytics)
