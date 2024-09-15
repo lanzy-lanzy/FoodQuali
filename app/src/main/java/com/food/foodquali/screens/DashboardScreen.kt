@@ -86,7 +86,7 @@ fun DashboardScreen(navController: NavController) {
 
             DashboardCard(
                 icon = Icons.Default.Analytics,
-                title = "Analyze Food Quality Now",
+                title = "Analyze Food Now",
                 description = "Start a new quality analysis",
                 onClick = { navController.navigate("analysis") }
             )
