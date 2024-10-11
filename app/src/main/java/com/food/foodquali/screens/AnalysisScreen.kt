@@ -308,6 +308,7 @@ fun ImagePreview(imageUri: Uri?) {
     }
 }
 
+
 @Composable
 fun AnalysisStatus(isAnalyzing: Boolean, analysisResult: String?) {
     when {
@@ -336,17 +337,45 @@ fun AnalysisStatus(isAnalyzing: Boolean, analysisResult: String?) {
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        analysisResult,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFF5D4037)
-                    )
+
+                    val sections = analysisResult.split("\n\n")
+                    sections.forEach { section ->
+                        val lines = section.split("\n")
+                        lines.forEachIndexed { index, line ->
+                            if (index == 0 && line.matches(Regex("\\d+\\..+"))) {
+                                Text(
+                                    text = line,
+                                    style = MaterialTheme.typography.titleMedium,  // Bigger title
+                                    color = Color(0xFF1E1D1D),
+                                    fontWeight = FontWeight.Bold
+                                )
+                            } else if (line.contains("Quality assessment") || line.contains("Freshness evaluation") ||
+                                line.contains("Potential issues or concerns") || line.contains("Suggestions for improvement") ||
+                                line.contains("Recommendations for storage or consumption")) {
+                                Text(
+                                    text = line,
+                                    style = MaterialTheme.typography.titleMedium,  // Bigger title
+                                    color = Color(0xFF151414),
+                                    fontWeight = FontWeight.Bold
+                                )
+                            } else {
+                                Text(
+                                    text = line,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color(0xFF5D4037)
+                                )
+                            }
+                            if (index < lines.size - 1) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
             }
         }
     }
 }
-
 @Composable
 fun HowItWorks(onToggleHowItWorks: () -> Unit) {
     Card(
