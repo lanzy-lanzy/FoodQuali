@@ -339,10 +339,23 @@ fun ImagePreview(imageUri: Uri?) {
                         val sections = analysisResult.split("\n\n")
                         sections.forEach { section ->
                             val lines = section.split("\n")
-                            lines.forEachIndexed { index, line ->
+                            var currentParagraph = StringBuilder()
+
+                            lines.forEach { line ->
                                 when {
                                     // Main section headers (1. Quality assessment, etc.)
                                     line.matches(Regex("\\d+\\..+")) -> {
+                                        // Output any accumulated paragraph text
+                                        if (currentParagraph.isNotEmpty()) {
+                                            Text(
+                                                text = currentParagraph.toString().trim(),
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = Color(0xFF5D4037),
+                                                modifier = Modifier.padding(start = 24.dp, bottom = 16.dp)
+                                            )
+                                            currentParagraph.clear()
+                                        }
+                                        
                                         Spacer(modifier = Modifier.height(8.dp))
                                         Text(
                                             text = line,
@@ -352,35 +365,23 @@ fun ImagePreview(imageUri: Uri?) {
                                             modifier = Modifier.padding(bottom = 12.dp)
                                         )
                                     }
-                                    // Subsection headers with colons
-                                    line.contains(":") -> {
-                                        val (header, content) = line.split(":", limit = 2)
-                                        Column(modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)) {
-                                            Text(
-                                                text = header.trim() + ":",
-                                                style = MaterialTheme.typography.titleMedium,
-                                                color = Color(0xFF1565C0),
-                                                fontWeight = FontWeight.SemiBold
-                                            )
-                                            Text(
-                                                text = content.trim(),
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = Color(0xFF5D4037),
-                                                modifier = Modifier.padding(start = 8.dp, top = 4.dp)
-                                            )
-                                        }
-                                    }
-                                    // Regular content
+                                    // Subsection content
                                     else -> {
-                                        Text(
-                                            text = line,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = Color(0xFF5D4037),
-                                            modifier = Modifier.padding(start = 24.dp, bottom = 6.dp)
-                                        )
+                                        currentParagraph.append(line).append(" ")
                                     }
                                 }
                             }
+
+                            // Output final paragraph if any content remains
+                            if (currentParagraph.isNotEmpty()) {
+                                Text(
+                                    text = currentParagraph.toString().trim(),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color(0xFF5D4037),
+                                    modifier = Modifier.padding(start = 24.dp, bottom = 16.dp)
+                                )
+                            }
+
                             Spacer(modifier = Modifier.height(20.dp))
                         }
                     }

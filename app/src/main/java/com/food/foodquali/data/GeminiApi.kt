@@ -47,7 +47,7 @@ object GeminiApi {
         sections.forEachIndexed { index, section ->
             formattedText = formattedText.replace(
                 "**${index + 1}. $section**",
-                "## **${index + 1}. $section**\n"
+                "${index + 1}. $section\n"
             )
         }
         return formattedText.replace(Regex("[*•#]"), "").trim()
