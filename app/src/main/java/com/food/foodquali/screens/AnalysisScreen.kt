@@ -307,75 +307,88 @@ fun ImagePreview(imageUri: Uri?) {
         }
     }
 }
+    @Composable
+    fun AnalysisStatus(isAnalyzing: Boolean, analysisResult: String?) {
+        when {
+            isAnalyzing && analysisResult == null -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(50.dp),
+                    color = Color(0xFFD84315)
+                )
+                Text(
+                    "Analyzing food...",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color(0xFF5D4037)
+                )
+            }
+            analysisResult != null -> {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF8E1))
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            "Analysis Result",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = Color(0xFFD84315),
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
 
+                        val sections = analysisResult.split("\n\n")
+                        sections.forEach { section ->
+                            val lines = section.split("\n")
+                            var currentParagraph = StringBuilder()
 
-@Composable
-fun AnalysisStatus(isAnalyzing: Boolean, analysisResult: String?) {
-    when {
-        isAnalyzing && analysisResult == null -> {
-            CircularProgressIndicator(
-                modifier = Modifier.size(50.dp),
-                color = Color(0xFFD84315)
-            )
-            Text(
-                "Analyzing food...",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color(0xFF5D4037)
-            )
-        }
-        analysisResult != null -> {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF8E1))
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        "Analysis Result",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = Color(0xFFD84315),
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
+                            lines.forEach { line ->
+                                when {
+                                    // Main section headers (1. Quality assessment, etc.)
+                                    line.matches(Regex("\\d+\\..+")) -> {
+                                        // Output any accumulated paragraph text
+                                        if (currentParagraph.isNotEmpty()) {
+                                            Text(
+                                                text = currentParagraph.toString().trim(),
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = Color(0xFF5D4037),
+                                                modifier = Modifier.padding(start = 24.dp, bottom = 16.dp)
+                                            )
+                                            currentParagraph.clear()
+                                        }
+                                        
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            text = line,
+                                            style = MaterialTheme.typography.titleLarge,
+                                            color = Color(0xFF2E7D32),
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(bottom = 12.dp)
+                                        )
+                                    }
+                                    // Subsection content
+                                    else -> {
+                                        currentParagraph.append(line).append(" ")
+                                    }
+                                }
+                            }
 
-                    val sections = analysisResult.split("\n\n")
-                    sections.forEach { section ->
-                        val lines = section.split("\n")
-                        lines.forEachIndexed { index, line ->
-                            if (index == 0 && line.matches(Regex("\\d+\\..+"))) {
+                            // Output final paragraph if any content remains
+                            if (currentParagraph.isNotEmpty()) {
                                 Text(
-                                    text = line,
-                                    style = MaterialTheme.typography.titleMedium,  // Bigger title
-                                    color = Color(0xFF1E1D1D),
-                                    fontWeight = FontWeight.Bold
-                                )
-                            } else if (line.contains("Quality assessment") || line.contains("Freshness evaluation") ||
-                                line.contains("Potential issues or concerns") || line.contains("Suggestions for improvement") ||
-                                line.contains("Recommendations for storage or consumption")) {
-                                Text(
-                                    text = line,
-                                    style = MaterialTheme.typography.titleMedium,  // Bigger title
-                                    color = Color(0xFF151414),
-                                    fontWeight = FontWeight.Bold
-                                )
-                            } else {
-                                Text(
-                                    text = line,
+                                    text = currentParagraph.toString().trim(),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = Color(0xFF5D4037)
+                                    color = Color(0xFF5D4037),
+                                    modifier = Modifier.padding(start = 24.dp, bottom = 16.dp)
                                 )
                             }
-                            if (index < lines.size - 1) {
-                                Spacer(modifier = Modifier.height(4.dp))
-                            }
+
+                            Spacer(modifier = Modifier.height(20.dp))
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }
         }
     }
-}
 @Composable
 fun HowItWorks(onToggleHowItWorks: () -> Unit) {
     Card(
